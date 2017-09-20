@@ -1,5 +1,5 @@
 //! Bit-banding access to STM32 peripherals.
-//! 
+//!
 //! # Examples
 //! ```rust,no_run
 //! # struct FakeGpio;
@@ -8,7 +8,7 @@
 //! use stm32_bitband::gpio_bitband;
 //!
 //! let gpioc = unsafe { &*GPIOC.get() }; // Get GPIOC somehow...
-//! let pin = gpio_bitband(gpioc).pin(13);
+//! let pin = gpio_bitband(gpioc).config(13);
 //! pin.output2();
 //! pin.open_drain();
 //! ```
@@ -101,13 +101,35 @@ impl PinConfigBlock {
 /// GPIO port configuration bits
 #[repr(C)]
 pub struct RegisterBlock {
-    pins: [PinConfigBlock; 16],
+    config: [PinConfigBlock; 16],
+    input: [VolatileCell<u32>; 16],
+    output: [VolatileCell<u32>; 16],
 }
 
 impl RegisterBlock {
     /// Get pin configuration bits
-    pub fn pin(&self, pin: usize) -> &PinConfigBlock {
-        &self.pins[pin]
+    pub fn config(&self, pin: usize) -> &PinConfigBlock {
+        &self.config[pin]
+    }
+
+    /// Read input value of the corresponding pin
+    pub fn input(&self, pin: usize) -> bool {
+        self.input[pin].get() != 0
+    }
+
+    /// Set pin output
+    pub fn output(&self, pin: usize, set: bool) {
+        self.output[pin].set(if set { 1 } else { 0 })
+    }
+
+    /// Configure pull-down (if port is in input mode)
+    pub fn pull_down(&self, pin: usize) {
+        self.output[pin].set(0)
+    }
+
+    /// Configure pull-up (if port is in input mode)
+    pub fn pull_up(&self, pin: usize) {
+        self.output[pin].set(1)
     }
 }
 

@@ -11,7 +11,7 @@ Bit-banding access to STM32 peripherals.
 use stm32_bitband::gpio_bitband;
 
 let gpioc = unsafe { &*GPIOC.get() }; // Get GPIOC somehow...
-let pin = gpio_bitband(gpioc).pin(13);
+let pin = gpio_bitband(gpioc).config(13);
 pin.output2();
 pin.open_drain();
 ```
