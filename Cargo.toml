@@ -21,5 +21,4 @@ optional = true
 version = "0.7.5"
 
 [features]
-default = ["stm32f103"]
-stm32f103 = ["stm32f103xx"]
+default = ["stm32f103xx"]

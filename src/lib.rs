@@ -13,7 +13,7 @@
 //! let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 //!
 //! // Set pin to 2Mhz, open-drain.
-//! // Modifies corresponding GPIO configuration bits without reads (write-only)
+//! // Modifies corresponding GPIO configuration bits without reads
 //! gpioc.bitband().config(13).output2().open_drain();
 //! # }
 //! ```
@@ -64,7 +64,7 @@ pub trait PortBits {
 }
 
 /// Common features for STM32F1/STM32W1 series.
-#[cfg(feature = "stm32f103")]
+#[cfg(feature = "stm32f103xx")]
 mod stm32f1xx {
     extern crate vcell;
     use self::vcell::VolatileCell;
@@ -171,7 +171,7 @@ mod stm32f1xx {
     }
 }
 
-#[cfg(feature = "stm32f103")]
+#[cfg(feature = "stm32f103xx")]
 mod stm32f103 {
     extern crate stm32f103xx;
     use self::stm32f103xx::gpioa;
