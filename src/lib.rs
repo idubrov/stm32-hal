@@ -9,8 +9,7 @@
 //!
 //! let gpioc = unsafe { &*GPIOC.get() }; // Get GPIOC somehow...
 //! let pin = gpio_bitband(gpioc).config(13);
-//! pin.output2();
-//! pin.open_drain();
+//! pin.output2().open_drain();
 //! ```
 #![deny(missing_docs)]
 #![deny(warnings)]
@@ -31,70 +30,81 @@ pub struct PinConfigBlock {
 
 impl PinConfigBlock {
     /// Input mode (reset state)
-    pub fn input(&self) {
+    pub fn input(&self) -> &Self {
         self.mode_low.set(0);
         self.mode_high.set(0);
+        self
     }
 
     /// Output mode, max speed 2 MHz.
-    pub fn output2(&self) {
+    pub fn output2(&self) -> &Self {
         self.mode_low.set(0);
         self.mode_high.set(1);
+        self
     }
 
     /// Output mode, max speed 10 MHz.
-    pub fn output10(&self) {
+    pub fn output10(&self) -> &Self {
         self.mode_low.set(1);
         self.mode_high.set(0);
+        self
     }
 
     /// Output mode, max speed 50 MHz.
-    pub fn output50(&self) {
+    pub fn output50(&self) -> &Self {
         self.mode_low.set(1);
         self.mode_high.set(1);
+        self
     }
 
     // Output config
 
     /// Push-pull
-    pub fn push_pull(&self) {
+    pub fn push_pull(&self) -> &Self {
         self.cnf_low.set(0);
+        self
     }
 
     /// Open-drain
-    pub fn open_drain(&self) {
+    pub fn open_drain(&self) -> &Self {
         self.cnf_low.set(1);
+        self
     }
 
     /// General purpose
-    pub fn general(&self) {
+    pub fn general(&self) -> &Self {
         self.cnf_high.set(0);
+        self
     }
 
     /// Alternate function
-    pub fn alternate(&self) {
+    pub fn alternate(&self) -> &Self {
         self.cnf_high.set(1);
+        self
     }
 
     // Input config
 
     /// Analog mode
-    pub fn analog(&self) {
+    pub fn analog(&self) -> &Self {
         self.cnf_low.set(0);
         self.cnf_high.set(0);
+        self
     }
 
     /// Floating input (reset state)
-    pub fn floating(&self) {
+    pub fn floating(&self) -> &Self {
         // Ordering is important: should never get reserved value of `11`
         self.cnf_high.set(0);
         self.cnf_low.set(1);
+        self
     }
 
     /// Input with pull-up / pull-down
-    pub fn pull_up_down(&self) {
+    pub fn pull_up_down(&self) -> &Self {
         self.cnf_low.set(0);
         self.cnf_high.set(1);
+        self
     }
 }
 
