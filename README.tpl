@@ -1,6 +1,6 @@
-[![crates.io](https://img.shields.io/crates/v/stm32-bitband.svg)](https://crates.io/crates/stm32-bitband)
-[![crates.io](https://img.shields.io/crates/d/stm32-bitband.svg)](https://crates.io/crates/stm32-bitband)
-[![CircleCI](https://img.shields.io/circleci/project/github/idubrov/stm32-bitband.svg)](https://circleci.com/gh/idubrov/stm32-bitband)
+[![crates.io](https://img.shields.io/crates/v/stm32-extras.svg)](https://crates.io/crates/stm32-extras)
+[![crates.io](https://img.shields.io/crates/d/stm32-extras.svg)](https://crates.io/crates/stm32-extras)
+[![CircleCI](https://img.shields.io/circleci/project/github/idubrov/stm32-extras.svg)](https://circleci.com/gh/idubrov/stm32-extras)
 
 # {{crate}}
 

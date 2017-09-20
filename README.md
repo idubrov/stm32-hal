@@ -1,19 +1,32 @@
-[![crates.io](https://img.shields.io/crates/v/stm32-bitband.svg)](https://crates.io/crates/stm32-bitband)
-[![crates.io](https://img.shields.io/crates/d/stm32-bitband.svg)](https://crates.io/crates/stm32-bitband)
-[![CircleCI](https://img.shields.io/circleci/project/github/idubrov/stm32-bitband.svg)](https://circleci.com/gh/idubrov/stm32-bitband)
+[![crates.io](https://img.shields.io/crates/v/stm32-extras.svg)](https://crates.io/crates/stm32-extras)
+[![crates.io](https://img.shields.io/crates/d/stm32-extras.svg)](https://crates.io/crates/stm32-extras)
+[![CircleCI](https://img.shields.io/circleci/project/github/idubrov/stm32-extras.svg)](https://circleci.com/gh/idubrov/stm32-extras)
 
-# stm32-bitband
+# stm32-extras
 
-Bit-banding access to STM32 peripherals.
+Extra API on top of STM32 device crates (`stm32f103xx`)
 
 ## Examples
-```rust
-use stm32_bitband::gpio_bitband;
 
-let gpioc = unsafe { &*GPIOC.get() }; // Get GPIOC somehow...
-let pin = gpio_bitband(gpioc).config(13);
-pin.output2();
-pin.open_drain();
+Configuring GPIO pins without disturbing other pins (no read-modify-write which could lead to
+data races):
+
+```rust
+use stm32_extras::BitBand;
+let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
+
+// Set pin to 2Mhz, open-drain
+gpioc.bitband().config(13).output2().open_drain();
+```
+
+Generalized interface to port bits:
+
+```rust
+use stm32_extras::PortBits;
+let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
+
+// Set pin to 2Mhz, open-drain
+gpioc.set_bits(13, 3, 0b101); // Set bits 13, 14 and 15 on GPIOC to 1, 0 and 1.
 ```
 
 ## License

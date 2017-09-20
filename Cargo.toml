@@ -4,8 +4,8 @@ categories = ["embedded", "no-std"]
 keywords = ["no-std", "arm", "cortex-m", "stm32"]
 description = "Bit-banding access for STM32 peripherals"
 documentation = "https://docs.rs/stm32-band"
-repository = "https://github.com/idubrov/stm32-bitband"
-name = "stm32-bitband"
+repository = "https://github.com/idubrov/stm32-extras"
+name = "stm32-extras"
 version = "0.1.0"
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -15,3 +15,11 @@ vcell = "0.1.0"
 
 [package.metadata.release]
 pre-release-hook = "./update-readme.sh"
+
+[dependencies.stm32f103xx]
+optional = true
+version = "0.7.5"
+
+[features]
+default = ["stm32f103"]
+stm32f103 = ["stm32f103xx"]
