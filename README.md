@@ -12,22 +12,22 @@ Configuring GPIO pins without disturbing other pins (no read-modify-write which 
 data races):
 
 ```rust
-use stm32_extras::BitBand;
+use stm32_extras::GPIOExtras;
 let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 
 // Set pin to 2Mhz, open-drain.
 // Modifies corresponding GPIO configuration bits without reads
-gpioc.bitband().config(13).output2().open_drain();
+gpioc.pin_config(13).output2().open_drain();
 ```
 
 Generalized interface to GPIO pins:
 
 ```rust
-use stm32_extras::PortBits;
+use stm32_extras::GPIOExtras;
 let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 
 // Set pins 13, 14 and 15 on GPIOC to 1, 0 and 1.
-gpioc.set_bits(13, 3, 0b101);
+gpioc.write_pin_range(13, 3, 0b101);
 ```
 
 ## License
