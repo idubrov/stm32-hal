@@ -8,13 +8,13 @@
 //! ```rust,no_run
 //! # extern crate stm32_extras;
 //! # extern crate stm32f103xx;
-//! use stm32_extras::BitBand;
+//! use stm32_extras::GPIOExtras;
 //! # fn main() {
 //! let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 //!
 //! // Set pin to 2Mhz, open-drain.
 //! // Modifies corresponding GPIO configuration bits without reads
-//! gpioc.bitband().config(13).output2().open_drain();
+//! gpioc.pin_config(13).output2().open_drain();
 //! # }
 //! ```
 //!
@@ -23,44 +23,40 @@
 //! ```rust,no_run
 //! # extern crate stm32_extras;
 //! # extern crate stm32f103xx;
-//! use stm32_extras::PortBits;
+//! use stm32_extras::GPIOExtras;
 //! # fn main() {
 //! let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 //!
 //! // Set pins 13, 14 and 15 on GPIOC to 1, 0 and 1.
-//! gpioc.set_bits(13, 3, 0b101);
+//! gpioc.write_pin_range(13, 3, 0b101);
 //! # }
 //! ```
 #![deny(missing_docs)]
 #![deny(warnings)]
 #![no_std]
 
-/// Get bitband access to the peripheral registers. All operations executed against bitband API
-/// are performed bit-by-bit.
-pub trait BitBand<T> {
-    /// Get access to the bit-band API of the peripheral.
-    fn bitband(&self) -> &T;
-}
-
 /// Convenient access to the bit blocks on GPIO ports.
-pub trait PortBits {
+pub trait GPIOExtras<T> {
     /// Set `count` bits on the GPIO port starting from the bit number `offset`. Other bits are not
     /// affected. Uses BSRR register to set/clear individual bits.
     /// Bits must fit into 16 bits of the GPIO port.
-    fn set_bits(&self, offset: usize, count: usize, data: u16);
+    fn write_pin_range(&self, offset: usize, count: usize, data: u16);
 
     /// Set single bit at the given `offset` in GPIO port. `offset` must be in the range 0..16.
-    fn set_bit(&self, offset: usize, bit: bool) {
-        self.set_bits(offset, 1, if bit { 1 } else { 0 });
+    fn write_pin(&self, offset: usize, bit: bool) {
+        self.write_pin_range(offset, 1, if bit { 1 } else { 0 });
     }
 
     /// Get `count` bits on the GPIO port starting from the bit number `offset`.
-    fn get_bits(&self, offset: usize, count: usize) -> u16;
+    fn read_pin_range(&self, offset: usize, count: usize) -> u16;
 
     /// Get single bit at the given `offset` in GPIO port. `offset` must be in the range 0..16.
-    fn get_bit(&self, offset: usize) -> bool {
-        self.get_bits(offset, 1) != 0
+    fn read_pin(&self, offset: usize) -> bool {
+        self.read_pin_range(offset, 1) != 0
     }
+
+    /// Get access to configuration bits for `pin` of GPIO port.
+    fn pin_config(&self, pin: usize) -> &T;
 }
 
 /// Common features for STM32F1/STM32W1 series.
@@ -70,14 +66,14 @@ mod stm32f1xx {
     use self::vcell::VolatileCell;
 
     /// Pin configuration registers for STM32F1/STM32W1
-    pub struct PortConfigBlock {
+    pub struct GPIOBitbandConfigBlock {
         mode_low: VolatileCell<u32>,
         mode_high: VolatileCell<u32>,
         cnf_low: VolatileCell<u32>,
         cnf_high: VolatileCell<u32>,
     }
 
-    impl PortConfigBlock {
+    impl GPIOBitbandConfigBlock {
         /// Input mode (reset state)
         pub fn input(&self) -> &Self {
             self.mode_low.set(0);
@@ -160,12 +156,12 @@ mod stm32f1xx {
     /// GPIO port configuration bits
     #[repr(C)]
     pub struct GPIOBitbandRegisterBlock {
-        config: [PortConfigBlock; 16],
+        config: [GPIOBitbandConfigBlock; 16],
     }
 
     impl GPIOBitbandRegisterBlock {
         /// Get pin configuration bits
-        pub fn config(&self, pin: usize) -> &PortConfigBlock {
+        pub fn config(&self, pin: usize) -> &GPIOBitbandConfigBlock {
             &self.config[pin]
         }
     }
@@ -175,8 +171,9 @@ mod stm32f1xx {
 mod stm32f103 {
     extern crate stm32f103xx;
     use self::stm32f103xx::gpioa;
-    use super::stm32f1xx::GPIOBitbandRegisterBlock as RB;
-    use super::{BitBand, PortBits};
+    use super::stm32f1xx::GPIOBitbandRegisterBlock;
+    use super::stm32f1xx::GPIOBitbandConfigBlock;
+    use super::GPIOExtras;
 
     const PERIPHERALS_BASE: usize = 0x4000_0000;
     const PERIPHERALS_ALIAS: usize = 0x4200_0000;
@@ -188,23 +185,22 @@ mod stm32f103 {
         unsafe { &*ptr }
     }
 
-    impl BitBand<RB> for gpioa::RegisterBlock {
-        fn bitband(&self) -> &RB {
-            to_bitband_address(self)
-        }
-    }
-
-    impl PortBits for gpioa::RegisterBlock {
-        fn set_bits(&self, offset: usize, count: usize, data: u16) {
+    impl GPIOExtras<GPIOBitbandConfigBlock> for gpioa::RegisterBlock {
+        fn write_pin_range(&self, offset: usize, count: usize, data: u16) {
             let mask = (1 << count) - 1;
             let bits = u32::from(data & mask) | // Set '1's
                 (u32::from(!data & mask) << 16); // Clear '0's
             self.bsrr.write(|w| unsafe { w.bits(bits << offset) });
         }
 
-        fn get_bits(&self, offset: usize, count: usize) -> u16 {
+        fn read_pin_range(&self, offset: usize, count: usize) -> u16 {
             let mask = (1 << count) - 1;
             ((self.idr.read().bits() >> offset) as u16) & mask
+        }
+
+        fn pin_config(&self, pin: usize) -> &GPIOBitbandConfigBlock {
+            let registers: &GPIOBitbandRegisterBlock = to_bitband_address(self);
+            &registers.config(pin)
         }
     }
 }
