@@ -10,9 +10,6 @@ version = "0.1.0"
 license = "MIT/Apache-2.0"
 readme = "README.md"
 
-[dependencies]
-vcell = "0.1.0"
-
 [package.metadata.release]
 pre-release-hook = "./update-readme.sh"
 
@@ -20,5 +17,9 @@ pre-release-hook = "./update-readme.sh"
 optional = true
 version = "0.7.5"
 
+[dependencies.vcell]
+optional = true
+version = "0.1.0"
+
 [features]
-default = ["stm32f103xx"]
+use-stm32f103xx = ["stm32f103xx", "vcell"]

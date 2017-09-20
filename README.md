@@ -16,7 +16,7 @@ use stm32_extras::BitBand;
 let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 
 // Set pin to 2Mhz, open-drain.
-// Modifies corresponding GPIO configuration bits without reads (write-only)
+// Modifies corresponding GPIO configuration bits without reads
 gpioc.bitband().config(13).output2().open_drain();
 ```
 
