@@ -15,18 +15,19 @@ data races):
 use stm32_extras::BitBand;
 let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 
-// Set pin to 2Mhz, open-drain
+// Set pin to 2Mhz, open-drain.
+// Modifies corresponding GPIO configuration bits without reads (write-only)
 gpioc.bitband().config(13).output2().open_drain();
 ```
 
-Generalized interface to port bits:
+Generalized interface to GPIO pins:
 
 ```rust
 use stm32_extras::PortBits;
 let gpioc = unsafe { &*stm32f103xx::GPIOC.get() }; // Get GPIOC somehow...
 
-// Set pin to 2Mhz, open-drain
-gpioc.set_bits(13, 3, 0b101); // Set bits 13, 14 and 15 on GPIOC to 1, 0 and 1.
+// Set pins 13, 14 and 15 on GPIOC to 1, 0 and 1.
+gpioc.set_bits(13, 3, 0b101);
 ```
 
 ## License
