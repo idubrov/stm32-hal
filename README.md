@@ -1,8 +1,8 @@
-[![crates.io](https://img.shields.io/crates/v/stm32-extras.svg)](https://crates.io/crates/stm32-extras)
-[![crates.io](https://img.shields.io/crates/d/stm32-extras.svg)](https://crates.io/crates/stm32-extras)
-[![CircleCI](https://img.shields.io/circleci/project/github/idubrov/stm32-extras.svg)](https://circleci.com/gh/idubrov/stm32-extras)
+[![crates.io](https://img.shields.io/crates/v/stm32-hal.svg)](https://crates.io/crates/stm32-hal)
+[![crates.io](https://img.shields.io/crates/d/stm32-hal.svg)](https://crates.io/crates/stm32-hal)
+[![CircleCI](https://img.shields.io/circleci/project/github/idubrov/stm32-hal.svg)](https://circleci.com/gh/idubrov/stm32-hal)
 
-# stm32-extras
+# stm32-hal
 
 Extra API on top of STM32 device crates (`stm32f103xx`)
 
