@@ -6,6 +6,8 @@
 
 {{readme}}
 
+[Full Documentation](https://docs.rs/stm32-hal)
+
 ## License
 
 Licensed under either of
